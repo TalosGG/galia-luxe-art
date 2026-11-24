@@ -4,75 +4,144 @@
 
   var WA = '972547301007';
   var root = document.documentElement;
+  var LANG = { he: 1, en: 1, ru: 1 }[root.lang] ? root.lang : 'he';
+  var RTL = root.dir === 'rtl';
+  var ROOT = root.getAttribute('data-root') || '';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var wa = function (text) { return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(text); };
 
   /* ------------------------------------------------------------------
+     Interface strings
+     ------------------------------------------------------------------ */
+  var UI = {
+    he: {
+      view: 'לצפייה ביצירה',
+      imgOf: function (i, n) { return 'תמונה ' + i + ' מתוך ' + n; },
+      img: 'תמונה',
+      waArt: function (name, p) { return 'שלום גליה, אשמח לפרטים על היצירה ' + name + ' (' + p + ').'; },
+      menuOpen: 'פתיחת תפריט', menuClose: 'סגירת תפריט',
+      formErr: 'נא למלא שם והודעה כדי שאוכל לחזור אליכם.',
+      formOk: 'ההודעה נפתחה בוואטסאפ — נותר רק ללחוץ על ״שליחה״. תודה!',
+      hello: 'שלום גליה,', myName: function (n) { return 'שמי ' + n + '.'; }, topic: 'נושא: ', phone: 'טלפון לחזרה: '
+    },
+    en: {
+      view: 'View the piece',
+      imgOf: function (i, n) { return 'image ' + i + ' of ' + n; },
+      img: 'Image',
+      waArt: function (name, p) { return 'Hello Galia, I would love more details about "' + name + '" (' + p + ').'; },
+      menuOpen: 'Open menu', menuClose: 'Close menu',
+      formErr: 'Please fill in your name and a message so I can get back to you.',
+      formOk: 'Your message has opened in WhatsApp — just press “Send”. Thank you!',
+      hello: 'Hello Galia,', myName: function (n) { return 'My name is ' + n + '.'; }, topic: 'Subject: ', phone: 'Phone: '
+    },
+    ru: {
+      view: 'Смотреть работу',
+      imgOf: function (i, n) { return 'изображение ' + i + ' из ' + n; },
+      img: 'Изображение',
+      waArt: function (name, p) { return 'Здравствуйте, Галия! Расскажите, пожалуйста, подробнее о работе «' + name + '» (' + p + ').'; },
+      menuOpen: 'Открыть меню', menuClose: 'Закрыть меню',
+      formErr: 'Пожалуйста, укажите имя и сообщение, чтобы я могла вам ответить.',
+      formOk: 'Сообщение открылось в WhatsApp — осталось нажать «Отправить». Спасибо!',
+      hello: 'Здравствуйте, Галия!', myName: function (n) { return 'Меня зовут ' + n + '.'; }, topic: 'Тема: ', phone: 'Телефон: '
+    }
+  }[LANG];
+
+  /* ------------------------------------------------------------------
      Collection data (from the studio's catalogue)
      ------------------------------------------------------------------ */
+  var HANG = {
+    he: 'מוכנה לתלייה מיידית, עם אביזרי תלייה מותקנים המבטיחים הצמדה מושלמת ובטוחה לקיר.',
+    en: 'Ready to hang immediately, with fitted hanging hardware for a perfect, secure hold on the wall.',
+    ru: 'Готова к размещению сразу: установленные крепления обеспечивают идеальную и надёжную фиксацию на стене.'
+  };
+  var L = { he: ['תשתית', 'גודל', 'חומרים', 'תלייה'], en: ['Base', 'Size', 'Materials', 'Hanging'], ru: ['Основа', 'Размер', 'Материалы', 'Крепление'] }[LANG];
+
   var ART = [
     {
-      id: 'the-royal-crane', name: 'The Royal Crane', he: 'העגור המלכותי', price: 2400,
-      layout: 'wide', tag: 'יצירה נבחרת', size: 'קוטר 60 ס״מ',
+      id: 'the-royal-crane', name: 'The Royal Crane', price: 2400, layout: 'wide',
+      sub: { he: 'העגור המלכותי', en: '', ru: 'Королевский журавль' },
+      tag: { he: 'יצירה נבחרת', en: 'Featured', ru: 'Избранная работа' },
+      size: { he: 'קוטר 60 ס״מ', en: '60 cm diameter', ru: 'диаметр 60 см' },
       cover: 'crane-1', images: ['crane-1', 'crane-2', 'crane-3'],
-      desc: 'יצירה עוצרת נשימה המשלבת טקסטורה עשירה וסימבוליקה של חופש ואצילות. העגור, שנוצר בעבודת יד קפדנית, נראה כמעט חי בזכות משחקי האור והחומרים היוקרתיים.',
-      specs: [
-        ['תשתית', 'עבודת יד על MDF איכותי.'],
-        ['גודל', 'קוטר 60 ס״מ.'],
-        ['חומרים', 'אקריליק, משחת טקסטורה, שבבי מראה (Mirror Crushed Stones), אבני קוורץ (Crystal Quartz) וציפוי אפוקסי רזין יוקרתי.'],
-        ['תלייה', 'מוכנה לתלייה מיידית, עם אביזרי תלייה מותקנים המבטיחים הצמדה מושלמת ובטוחה לקיר.']
-      ]
+      desc: {
+        he: 'יצירה עוצרת נשימה המשלבת טקסטורה עשירה וסימבוליקה של חופש ואצילות. העגור, שנוצר בעבודת יד קפדנית, נראה כמעט חי בזכות משחקי האור והחומרים היוקרתיים.',
+        en: 'A breathtaking piece that combines rich texture with the symbolism of freedom and nobility. The crane, created with meticulous handwork, looks almost alive thanks to the play of light and the luxurious materials.',
+        ru: 'Захватывающая дух работа, сочетающая богатую текстуру и символику свободы и благородства. Журавль, созданный кропотливой ручной работой, выглядит почти живым благодаря игре света и роскошным материалам.'
+      },
+      specs: {
+        he: [[L[0], 'עבודת יד על MDF איכותי.'], [L[1], 'קוטר 60 ס״מ.'], [L[2], 'אקריליק, משחת טקסטורה, שבבי מראה (Mirror Crushed Stones), אבני קוורץ (Crystal Quartz) וציפוי אפוקסי רזין יוקרתי.'], [L[3], HANG.he]],
+        en: [[L[0], 'Handcrafted on quality MDF.'], [L[1], '60 cm diameter.'], [L[2], 'Acrylic, texture paste, crushed mirror stones, crystal quartz and a luxurious epoxy resin coating.'], [L[3], HANG.en]],
+        ru: [[L[0], 'Ручная работа на качественном МДФ.'], [L[1], 'Диаметр 60 см.'], [L[2], 'Акрил, текстурная паста, зеркальная крошка (Mirror Crushed Stones), кварц (Crystal Quartz) и роскошное покрытие из эпоксидной смолы.'], [L[3], HANG.ru]]
+      }
     },
     {
-      id: 'fragments-of-us', name: 'Fragments of Us', he: 'רסיסים מאיתנו', price: 6000,
-      layout: 'sq', size: 'קוטר 80 ס״מ',
+      id: 'fragments-of-us', name: 'Fragments of Us', price: 6000, layout: 'sq',
+      sub: { he: 'רסיסים מאיתנו', en: '', ru: 'Фрагменты нас' },
+      size: { he: 'קוטר 80 ס״מ', en: '80 cm diameter', ru: 'диаметр 80 см' },
       cover: 'fragments-1', images: ['fragments-1', 'fragments-2', 'fragments-3'],
-      desc: 'יצירה עוצמתית המשלבת קונטרסט מרתק בין אור לצל, בין דמויות לזמן. עבודת יד קפדנית המשלבת אלמנטים של מראה ושקיפות, היוצרים תחושה של עומק וסיפור שמתגלה בכל מבט מחדש.',
-      specs: [
-        ['תשתית', 'עבודת יד על MDF איכותי.'],
-        ['גודל', 'קוטר 80 ס״מ.'],
-        ['חומרים', 'אקריליק, משחת טקסטורה, שברי מראה, עלי זהב ואבני קריסטל המעניקים ניצנוץ יוקרתי.'],
-        ['תלייה', 'היצירה מוכנה לתלייה מיידית.']
-      ]
+      desc: {
+        he: 'יצירה עוצמתית המשלבת קונטרסט מרתק בין אור לצל, בין דמויות לזמן. עבודת יד קפדנית המשלבת אלמנטים של מראה ושקיפות, היוצרים תחושה של עומק וסיפור שמתגלה בכל מבט מחדש.',
+        en: 'A powerful piece built on a captivating contrast between light and shadow, between figures and time. Meticulous handwork with elements of mirror and transparency creates a sense of depth and a story that reveals itself anew with every glance.',
+        ru: 'Сильная работа, построенная на завораживающем контрасте света и тени, фигур и времени. Кропотливая ручная работа с элементами зеркала и прозрачности создаёт ощущение глубины и истории, которая раскрывается заново с каждым взглядом.'
+      },
+      specs: {
+        he: [[L[0], 'עבודת יד על MDF איכותי.'], [L[1], 'קוטר 80 ס״מ.'], [L[2], 'אקריליק, משחת טקסטורה, שברי מראה, עלי זהב ואבני קריסטל המעניקים ניצנוץ יוקרתי.'], [L[3], 'היצירה מוכנה לתלייה מיידית.']],
+        en: [[L[0], 'Handcrafted on quality MDF.'], [L[1], '80 cm diameter.'], [L[2], 'Acrylic, texture paste, mirror fragments, gold leaf and crystal stones for a luxurious sparkle.'], [L[3], 'Ready to hang immediately.']],
+        ru: [[L[0], 'Ручная работа на качественном МДФ.'], [L[1], 'Диаметр 80 см.'], [L[2], 'Акрил, текстурная паста, осколки зеркала, сусальное золото и кристаллы, придающие роскошное сияние.'], [L[3], 'Готова к размещению сразу.']]
+      }
     },
     {
-      id: 'the-seahorse', name: 'The Seahorse', he: 'סוסון הים', price: 1600,
-      size: '40×60 ס״מ',
+      id: 'the-seahorse', name: 'The Seahorse', price: 1600,
+      sub: { he: 'סוסון הים', en: '', ru: 'Морской конёк' },
+      size: { he: '40×60 ס״מ', en: '40×60 cm', ru: '40×60 см' },
       cover: 'seahorse-1', images: ['seahorse-1', 'seahorse-2', 'seahorse-3'],
-      desc: 'יצירה מרהיבה המשלבת את עומק הים עם זוהר מעורר השראה. עבודת מוזאיקה עדינה ממראת ברונזה בשילוב עלי זהב וקריסטלים יוצרת משחקי אור מהפנטים, המעניקים לכל חלל תחושה של רוגע ויוקרה.',
-      specs: [
-        ['תשתית', 'עבודת יד על MDF איכותי — בסיס חזק המבטיח את עמידות היצירה לשנים רבות.'],
-        ['גודל', '40×60 ס״מ.'],
-        ['חומרים', 'אקריליק, משחת טקסטורה, מוזאיקת מראת ברונזה, עלי זהב (פוטאל), אבני קוורץ (Crystal Quartz) וציפוי אפוקסי רזין חלקי המעניק ברק ממוקד ועומק זכוכיתי.'],
-        ['תלייה', 'מוכנה לתלייה מיידית, עם אביזרי תלייה מותקנים המבטיחים הצמדה מושלמת ובטוחה לקיר.']
-      ]
+      desc: {
+        he: 'יצירה מרהיבה המשלבת את עומק הים עם זוהר מעורר השראה. עבודת מוזאיקה עדינה ממראת ברונזה בשילוב עלי זהב וקריסטלים יוצרת משחקי אור מהפנטים, המעניקים לכל חלל תחושה של רוגע ויוקרה.',
+        en: 'A stunning piece that brings together the depth of the sea and an inspiring radiance. Delicate bronze-mirror mosaic combined with gold leaf and crystals creates a mesmerising play of light, giving any space a feeling of calm and luxury.',
+        ru: 'Впечатляющая работа, соединяющая глубину моря с вдохновляющим сиянием. Тонкая мозаика из бронзового зеркала в сочетании с сусальным золотом и кристаллами создаёт завораживающую игру света и дарит любому пространству ощущение покоя и роскоши.'
+      },
+      specs: {
+        he: [[L[0], 'עבודת יד על MDF איכותי — בסיס חזק המבטיח את עמידות היצירה לשנים רבות.'], [L[1], '40×60 ס״מ.'], [L[2], 'אקריליק, משחת טקסטורה, מוזאיקת מראת ברונזה, עלי זהב (פוטאל), אבני קוורץ (Crystal Quartz) וציפוי אפוקסי רזין חלקי המעניק ברק ממוקד ועומק זכוכיתי.'], [L[3], HANG.he]],
+        en: [[L[0], 'Handcrafted on quality MDF — a strong base that keeps the work durable for many years.'], [L[1], '40×60 cm.'], [L[2], 'Acrylic, texture paste, bronze-mirror mosaic, gold leaf, crystal quartz and a partial epoxy resin coating for focused shine and glass-like depth.'], [L[3], HANG.en]],
+        ru: [[L[0], 'Ручная работа на качественном МДФ — прочная основа, обеспечивающая долговечность работы на многие годы.'], [L[1], '40×60 см.'], [L[2], 'Акрил, текстурная паста, мозаика из бронзового зеркала, сусальное золото (поталь), кварц (Crystal Quartz) и частичное покрытие эпоксидной смолой, дающее точечный блеск и стеклянную глубину.'], [L[3], HANG.ru]]
+      }
     },
     {
-      id: 'quiet-strength', name: 'Quiet Strength', he: 'עוצמה שקטה', price: 3800,
-      size: '80 ס״מ',
+      id: 'quiet-strength', name: 'Quiet Strength', price: 3800,
+      sub: { he: 'עוצמה שקטה', en: '', ru: 'Тихая сила' },
+      size: { he: '80 ס״מ', en: '80 cm', ru: '80 см' },
       cover: 'elephant-1', images: ['elephant-1'],
-      desc: 'עבודה עוצמתית ומלאת נוכחות בהשראת כוח, חוכמה ואצילות הטבע. דמות הפיל משתלבת בתוך שכבות של טקסטורה עמוקה, בגוני שחור, אפור וזהב מטאלי היוצרים מראה יוקרתי ודרמטי.',
-      specs: [
-        ['תשתית', 'יצירה מקורית בטכניקה מעורבת על MDF.'],
-        ['גודל', '80 ס״מ.'],
-        ['גוונים', 'שחור, אפור וזהב מטאלי.']
-      ]
+      desc: {
+        he: 'עבודה עוצמתית ומלאת נוכחות בהשראת כוח, חוכמה ואצילות הטבע. דמות הפיל משתלבת בתוך שכבות של טקסטורה עמוקה, בגוני שחור, אפור וזהב מטאלי היוצרים מראה יוקרתי ודרמטי.',
+        en: 'A powerful work full of presence, inspired by the strength, wisdom and nobility of nature. The figure of the elephant emerges from layers of deep texture in black, grey and metallic gold, creating a luxurious and dramatic look.',
+        ru: 'Мощная, наполненная присутствием работа, вдохновлённая силой, мудростью и благородством природы. Фигура слона проступает сквозь слои глубокой текстуры в чёрных, серых и золотисто-металлических тонах, создавая роскошный и драматичный образ.'
+      },
+      specs: {
+        he: [[L[0], 'יצירה מקורית בטכניקה מעורבת על MDF.'], [L[1], '80 ס״מ.'], ['גוונים', 'שחור, אפור וזהב מטאלי.']],
+        en: [[L[0], 'Original mixed-media work on MDF.'], [L[1], '80 cm.'], ['Palette', 'Black, grey and metallic gold.']],
+        ru: [[L[0], 'Оригинальная работа в смешанной технике на МДФ.'], [L[1], '80 см.'], ['Палитра', 'Чёрный, серый и золотой металлик.']]
+      }
     },
     {
-      id: 'the-sparkling-cat', name: 'The Sparkling Cat', he: 'החתול המנצנץ', price: 1500,
-      size: 'פסל · 12,000 קריסטלים', contain: true,
+      id: 'the-sparkling-cat', name: 'The Sparkling Cat', price: 1500, contain: true,
+      sub: { he: 'החתול המנצנץ', en: '', ru: 'Сверкающий кот' },
+      size: { he: 'פסל · 12,000 קריסטלים', en: 'Sculpture · 12,000 crystals', ru: 'Скульптура · 12 000 кристаллов' },
       cover: 'cat-1', images: ['cat-1'],
-      desc: 'יצירת אמנות ייחודית במינה המעוטרת ב־12,000 קריסטלים מנצנצים, ששובצו בעבודת יד קפדנית וסבלנית. כל קריסטל מונח במקומו כדי ליצור משחק אור וצל מהפנט. פריט עיצובי יוקרתי שמעניק סטייל ואופי לכל פינה בבית.',
-      specs: [
-        ['סגנון', 'פסל דקורטיבי בעבודת יד.'],
-        ['טכניקה', 'שיבוץ ידני של 12,000 קריסטלים.'],
-        ['משמעות', 'שילוב בין יופי, אסתטיקה ויוקרה.']
-      ]
+      desc: {
+        he: 'יצירת אמנות ייחודית במינה המעוטרת ב־12,000 קריסטלים מנצנצים, ששובצו בעבודת יד קפדנית וסבלנית. כל קריסטל מונח במקומו כדי ליצור משחק אור וצל מהפנט. פריט עיצובי יוקרתי שמעניק סטייל ואופי לכל פינה בבית.',
+        en: 'A truly unique work of art adorned with 12,000 sparkling crystals, each set by hand with patience and precision. Every crystal is placed to create a mesmerising play of light and shadow. A luxurious design piece that adds style and character to any corner of the home.',
+        ru: 'Уникальное произведение искусства, украшенное 12 000 сверкающих кристаллов, инкрустированных вручную — тщательно и терпеливо. Каждый кристалл занимает своё место, создавая завораживающую игру света и тени. Роскошный предмет интерьера, который придаёт стиль и характер любому уголку дома.'
+      },
+      specs: {
+        he: [['סגנון', 'פסל דקורטיבי בעבודת יד.'], ['טכניקה', 'שיבוץ ידני של 12,000 קריסטלים.'], ['משמעות', 'שילוב בין יופי, אסתטיקה ויוקרה.']],
+        en: [['Style', 'Handcrafted decorative sculpture.'], ['Technique', '12,000 crystals set by hand.'], ['Meaning', 'A blend of beauty, aesthetics and luxury.']],
+        ru: [['Стиль', 'Декоративная скульптура ручной работы.'], ['Техника', 'Ручная инкрустация 12 000 кристаллов.'], ['Смысл', 'Сочетание красоты, эстетики и роскоши.']]
+      }
     }
   ];
-  var src = function (n) { return 'assets/art/' + n + '.webp'; };
+  var src = function (n) { return ROOT + 'assets/art/' + n + '.webp'; };
   var price = function (n) { return '₪' + n.toLocaleString('en-US'); };
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
 
@@ -82,17 +151,18 @@
   var grid = $('#grid');
   if (grid) {
     grid.innerHTML = ART.map(function (a, i) {
-      return '<a class="card' + (a.layout ? ' card--' + a.layout : '') + '" href="#art-' + a.id + '" data-art="' + a.id + '" data-reveal style="--d:' + (i % 3) * 0.1 + 's" aria-label="' + a.name + ' — ' + a.he + ', ' + price(a.price) + '. לצפייה ביצירה">' +
+      var sub = a.sub[LANG], tag = a.tag && a.tag[LANG];
+      return '<a class="card' + (a.layout ? ' card--' + a.layout : '') + '" href="#art-' + a.id + '" data-art="' + a.id + '" data-reveal style="--d:' + (i % 3) * 0.1 + 's" aria-label="' + a.name + (sub ? ' — ' + sub : '') + ', ' + price(a.price) + '. ' + UI.view + '">' +
         '<span class="card__fig">' +
-          (a.tag ? '<span class="card__tag">' + a.tag + '</span>' : '') +
+          (tag ? '<span class="card__tag">' + tag + '</span>' : '') +
           '<img' + (a.contain ? ' class="is-contain"' : '') + ' src="' + src(a.cover) + '" alt="" loading="lazy">' +
-          '<span class="card__view">לצפייה ביצירה <svg><use href="#ic-arrow"/></svg></span>' +
+          '<span class="card__view">' + UI.view + ' <svg><use href="#ic-arrow"/></svg></span>' +
         '</span>' +
         '<span class="card__body">' +
           '<span class="card__no" dir="ltr">N° ' + pad(i + 1) + '</span>' +
           '<span class="card__name" dir="ltr">' + a.name + '</span>' +
           '<span class="card__price" dir="ltr">' + price(a.price) + '</span>' +
-          '<span class="card__he">' + a.he + ' · ' + a.size + '</span>' +
+          '<span class="card__he">' + (sub ? sub + ' · ' : '') + a.size[LANG] + '</span>' +
         '</span></a>';
     }).join('');
 
@@ -123,7 +193,7 @@
     sImg.classList.add('is-swap');
     setTimeout(function () {
       sImg.src = src(current.images[imgIndex]);
-      sImg.alt = current.name + ' — ' + current.he + ' (תמונה ' + (imgIndex + 1) + ' מתוך ' + current.images.length + ')';
+      sImg.alt = current.name + ' (' + UI.imgOf(imgIndex + 1, current.images.length) + ')';
       sImg.onload = function () { sImg.classList.remove('is-swap'); };
     }, reduce ? 0 : 180);
     $$('button', sThumbs).forEach(function (b, n) { b.setAttribute('aria-current', n === imgIndex ? 'true' : 'false'); });
@@ -140,16 +210,17 @@
     $('#sheetNo').textContent = 'N° ' + pad(idx + 1) + ' / ' + pad(ART.length);
     $('#sheetNo').setAttribute('dir', 'ltr');
     $('#sheetTitle').textContent = current.name;
-    $('#sheetHe').textContent = current.he;
-    $('#sheetDesc').textContent = current.desc;
+    $('#sheetHe').textContent = current.sub[LANG];
+    $('#sheetHe').hidden = !current.sub[LANG];
+    $('#sheetDesc').textContent = current.desc[LANG];
     $('#sheetPrice').textContent = price(current.price);
     $('#sheetPrice').setAttribute('dir', 'ltr');
-    $('#sheetSpecs').innerHTML = current.specs.map(function (s) {
+    $('#sheetSpecs').innerHTML = current.specs[LANG].map(function (s) {
       return '<div><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>';
     }).join('');
-    $('#sheetWa').href = wa('שלום גליה, אשמח לפרטים על היצירה ' + current.name + ' (' + price(current.price) + ').');
+    $('#sheetWa').href = wa(UI.waArt(current.name, price(current.price)));
     sThumbs.innerHTML = current.images.length > 1 ? current.images.map(function (n, i) {
-      return '<button type="button" data-i="' + i + '" aria-label="תמונה ' + (i + 1) + '"><img src="' + src(n) + '" alt=""></button>';
+      return '<button type="button" data-i="' + i + '" aria-label="' + UI.img + ' ' + (i + 1) + '"><img src="' + src(n) + '" alt=""></button>';
     }).join('') : '';
     sImg.src = src(current.images[0]);
     showImage(0);
@@ -179,9 +250,10 @@
     });
     document.addEventListener('keydown', function (e) {
       if (sheet.hidden) return;
+      var fwd = RTL ? 'ArrowLeft' : 'ArrowRight', back = RTL ? 'ArrowRight' : 'ArrowLeft';
       if (e.key === 'Escape') closeSheet();
-      else if (e.key === 'ArrowLeft') showImage(imgIndex + 1);
-      else if (e.key === 'ArrowRight') showImage(imgIndex - 1);
+      else if (e.key === fwd) showImage(imgIndex + 1);
+      else if (e.key === back) showImage(imgIndex - 1);
       else if (e.key === 'Tab') {
         var f = $$('button, a[href]', panel).filter(function (el) { return el.offsetParent !== null; });
         if (!f.length) return;
@@ -193,12 +265,19 @@
   }
 
   /* ------------------------------------------------------------------
-     WhatsApp links
+     WhatsApp links, language switch
      ------------------------------------------------------------------ */
   $$('[data-wa]').forEach(function (a) {
     a.href = wa(a.getAttribute('data-wa'));
     a.target = '_blank';
     a.rel = 'noopener';
+  });
+
+  $$('.lang a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      try { localStorage.setItem('gla-lang', a.getAttribute('data-l')); } catch (e) { /* storage unavailable */ }
+      if (location.hash && a.href.indexOf('#') < 0) a.href += location.hash;
+    });
   });
 
   /* ------------------------------------------------------------------
@@ -231,7 +310,7 @@
   function setMenu(open) {
     root.classList.toggle('menu-open', open);
     burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    burger.setAttribute('aria-label', open ? 'סגירת תפריט' : 'פתיחת תפריט');
+    burger.setAttribute('aria-label', open ? UI.menuClose : UI.menuOpen);
   }
   if (burger) {
     burger.addEventListener('click', function () { setMenu(!root.classList.contains('menu-open')); });
@@ -351,16 +430,16 @@
         if (!ok && !bad) bad = el;
       });
       if (bad) {
-        hint.textContent = 'נא למלא שם והודעה כדי שאוכל לחזור אליכם.';
+        hint.textContent = UI.formErr;
         hint.classList.add('is-err');
         bad.focus();
         return;
       }
-      var lines = ['שלום גליה,', 'שמי ' + f.name.value.trim() + '.', 'נושא: ' + f.topic.value, '', f.message.value.trim()];
-      if (f.phone.value.trim()) lines.push('', 'טלפון לחזרה: ' + f.phone.value.trim());
+      var lines = [UI.hello, UI.myName(f.name.value.trim()), UI.topic + f.topic.value, '', f.message.value.trim()];
+      if (f.phone.value.trim()) lines.push('', UI.phone + f.phone.value.trim());
       window.open(wa(lines.join('\n')), '_blank', 'noopener');
       hint.classList.remove('is-err');
-      hint.textContent = 'ההודעה נפתחה בוואטסאפ — נותר רק ללחוץ על ״שליחה״. תודה!';
+      hint.textContent = UI.formOk;
     });
   }
 

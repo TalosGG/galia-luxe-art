@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" data-root="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,10 +16,10 @@
 <link rel="apple-touch-icon" href="assets/brand/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/img/hero-poster.jpg">
 <link rel="stylesheet" href="css/style.css">
-<script>document.documentElement.classList.add('js');</script>
+<script>document.documentElement.classList.add('js');(function(){try{var s=localStorage.getItem('gla-lang');if('he'==='he'&&!s&&/^ru/i.test(navigator.language||'')){location.replace('ru/'+location.hash)}}catch(e){}})();</script>
 </head>
 <body>
 
@@ -83,7 +83,12 @@
     <div class="wrap topbar__in">
       <span class="topbar__bsd" title="בסיעתא דשמיא">בס״ד</span>
       <span class="topbar__msg">יצירות מקוריות בעבודת יד <i>✦</i> תעודת אותנטיות לכל יצירה <i>✦</i> התאמה אישית לחללים פרטיים ועסקיים</span>
-      <a class="topbar__tel" href="tel:+972547301007" dir="ltr">054-730-1007</a>
+      <span class="topbar__end"><div class="lang lang--top" role="group" aria-label="Language">
+        <a href="./" hreflang="he" data-l="he" aria-current="true" lang="he">עב</a>
+        <a href="en/" hreflang="en" data-l="en" lang="en">EN</a>
+        <a href="ru/" hreflang="ru" data-l="ru" lang="ru">RU</a>
+      </div>
+      <a class="topbar__tel" href="tel:+972547301007" dir="ltr">054-730-1007</a></span>
     </div>
   </div>
   <div class="wrap nav">
@@ -99,7 +104,17 @@
       <a href="#workshops">סדנאות</a>
       <a href="#contact">צור קשר</a>
       <a class="btn btn--gold menu__cta" href="#contact">לתיאום ייעוץ</a>
+      <div class="lang lang--menu" role="group" aria-label="Language">
+        <a href="./" hreflang="he" data-l="he" aria-current="true" lang="he">עב</a>
+        <a href="en/" hreflang="en" data-l="en" lang="en">EN</a>
+        <a href="ru/" hreflang="ru" data-l="ru" lang="ru">RU</a>
+      </div>
     </nav>
+    <div class="lang lang--nav" role="group" aria-label="Language">
+        <a href="./" hreflang="he" data-l="he" aria-current="true" lang="he">עב</a>
+        <a href="en/" hreflang="en" data-l="en" lang="en">EN</a>
+        <a href="ru/" hreflang="ru" data-l="ru" lang="ru">RU</a>
+      </div>
     <a class="btn btn--line nav__cta" href="#contact">לתיאום ייעוץ</a>
     <button class="burger" id="burger" aria-label="פתיחת תפריט" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
